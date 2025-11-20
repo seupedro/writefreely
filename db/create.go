@@ -66,7 +66,7 @@ var UnsetSize OptionalInt = OptionalInt{Set: false, Value: 0}
 var UnsetDefault OptionalString = OptionalString{Set: false, Value: ""}
 
 func (d ColumnType) Format(dialect DialectType, size OptionalInt) (string, error) {
-	if dialect != DialectMySQL && dialect != DialectSQLite {
+	if dialect != DialectMySQL && dialect != DialectSQLite && dialect != DialectPostgreSQL {
 		return "", fmt.Errorf("unsupported column type %d for dialect %d and size %v", d, dialect, size)
 	}
 	switch d {
@@ -74,6 +74,10 @@ func (d ColumnType) Format(dialect DialectType, size OptionalInt) (string, error
 		{
 			if dialect == DialectSQLite {
 				return "INTEGER", nil
+			}
+			if dialect == DialectPostgreSQL {
+				// PostgreSQL doesn't support display width modifiers
+				return "SMALLINT", nil
 			}
 			mod := ""
 			if size.Set {
@@ -84,6 +88,10 @@ func (d ColumnType) Format(dialect DialectType, size OptionalInt) (string, error
 	case ColumnTypeInteger:
 		{
 			if dialect == DialectSQLite {
+				return "INTEGER", nil
+			}
+			if dialect == DialectPostgreSQL {
+				// PostgreSQL doesn't support display width modifiers
 				return "INTEGER", nil
 			}
 			mod := ""
@@ -119,9 +127,15 @@ func (d ColumnType) Format(dialect DialectType, size OptionalInt) (string, error
 			if dialect == DialectSQLite {
 				return "INTEGER", nil
 			}
+			if dialect == DialectPostgreSQL {
+				return "BOOLEAN", nil
+			}
 			return "TINYINT(1)", nil
 		}
 	case ColumnTypeDateTime:
+		if dialect == DialectPostgreSQL {
+			return "TIMESTAMP", nil
+		}
 		return "DATETIME", nil
 	case ColumnTypeText:
 		return "TEXT", nil
@@ -152,6 +166,9 @@ func (c *Column) SetDefault(value string) *Column {
 func (c *Column) SetDefaultCurrentTimestamp() *Column {
 	def := "NOW()"
 	if c.Dialect == DialectSQLite {
+		def = "CURRENT_TIMESTAMP"
+	}
+	if c.Dialect == DialectPostgreSQL {
 		def = "CURRENT_TIMESTAMP"
 	}
 	c.Default = OptionalString{Set: true, Value: def}

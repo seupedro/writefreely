@@ -20,7 +20,14 @@ func (b *AlterTableSqlBuilder) AddColumn(col *Column) *AlterTableSqlBuilder {
 
 func (b *AlterTableSqlBuilder) ChangeColumn(name string, col *Column) *AlterTableSqlBuilder {
 	if colVal, err := col.String(); err == nil {
-		b.Changes = append(b.Changes, fmt.Sprintf("CHANGE COLUMN %s %s", name, colVal))
+		// PostgreSQL uses ALTER COLUMN syntax instead of CHANGE COLUMN
+		// Note: This is a simplified version. Full PostgreSQL ALTER COLUMN support
+		// may require multiple ALTER statements for type, nullability, default, etc.
+		if b.Dialect == DialectPostgreSQL {
+			b.Changes = append(b.Changes, fmt.Sprintf("ALTER COLUMN %s TYPE %s", name, colVal))
+		} else {
+			b.Changes = append(b.Changes, fmt.Sprintf("CHANGE COLUMN %s %s", name, colVal))
+		}
 	}
 	return b
 }
