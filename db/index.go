@@ -49,5 +49,9 @@ func (b *CreateIndexSqlBuilder) ToSQL() (string, error) {
 }
 
 func (b *DropIndexSqlBuilder) ToSQL() (string, error) {
+	// PostgreSQL doesn't use "ON table" syntax for DROP INDEX
+	if b.Dialect == DialectPostgreSQL {
+		return fmt.Sprintf("DROP INDEX %s", b.Name), nil
+	}
 	return fmt.Sprintf("DROP INDEX %s on %s", b.Name, b.Table), nil
 }

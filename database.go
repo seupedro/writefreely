@@ -48,8 +48,9 @@ const (
 	mySQLErrTooManyConns = 1040
 	mySQLErrMaxUserConns = 1203
 
-	driverMySQL  = "mysql"
-	driverSQLite = "sqlite3"
+	driverMySQL      = "mysql"
+	driverSQLite     = "sqlite3"
+	driverPostgreSQL = "postgres"
 )
 
 var (

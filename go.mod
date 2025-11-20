@@ -12,6 +12,7 @@ require (
 	github.com/go-ini/ini v1.67.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/go-test/deep v1.0.1 // indirect
+	github.com/lib/pq v1.10.9
 	github.com/gobuffalo/envy v1.9.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/gorilla/csrf v1.7.2
